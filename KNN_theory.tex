@@ -1,0 +1,16 @@
+\section{Parallel KNN}
+
+% See ESLII page 33
+% See Dirk page
+\begin{itemize}
+    \item The $k^{th}$ Nearest-Neighbor (k-NN) methods use observations in the training set $T$ closest in feature space to a given unknown sample $\bm{x}$ to directly find its corresponding prediction $\overline{y}$
+    \item The prediction for the k-NN classifier is usually calculated as 
+    \[
+        \overline{y} \left( \bm{x} \right) = \sum_{\bm{x}_{i} \in N_{k} (\bm{x})} y_{i}
+    \]
+    \item The notion of 'clostest' implies the use of some sort of meteric. More often than not, feature vectors belong to $\mathbb{R}^{n}$ allowing us to use commonly used metrics to define distance between vectors in our feature space. For our purposes, we shall use the Euclidean norm as a measurement of determining how close two feature values are to each other. The Euclidean norm is simply defined as
+    \[
+        d \left( \bm{x}, \bm{y} \right) = \left( \sum_{i=1}^{n} \left( x_{i} - y_{i} \right)^{2} \right)
+    \]
+    \item When a unknown sample $\bm{x}$ is to be classified, a k-NN classifier computes the distance between $\bm{x}$ and the other points within the training set $T$. The training data is then sorted by distance and the $k^{th}$ closests training samples are then used to predict $\bm{x}$.
+\end{itemize}

@@ -1,0 +1,112 @@
+% Report content: b813f47d-864f-4422-92c8-e6f81b30efae
+% Describe the problem you are solving.  This does not need to be very in depth but should provide the reader with any 
+% information they need in order to understand what you are doing.
+% You can cite references but we are after *your* statement of the problem not a copy paste from elsewhere.
+
+% Describe your implementation.   This should not be a copy of your source code but should have enough detail to allow the 
+% reader to understand how your program works. You should definitely describe any data structures you have employed as well as any 
+% optimisations you have attempted.
+
+% Describe how you know that it works.  This applies to both the correctness and performance. "I tested it with a few cases" 
+% would be a low quality answer. How many test cases? Why those cases?  If you used optimisations, did they work? (Both in 
+% terms of preserving correctness and actually improving performance).
+
+% Description of performance. (Note that this is a bit more flexible than what is listed in the ECP).  What can you say about the performance 
+% of your implementation? How does the run time vary with different inputs? You can also include content about 
+% profiling or internal timing analysis you have done here.
+%%
+\documentclass[preprint,12pt]{elsarticle}
+
+%% Use the option review to obtain double line spacing
+%% \documentclass[preprint,review,12pt]{elsarticle}
+
+%% Use the options 1p,twocolumn; 3p; 3p,twocolumn; 5p; or 5p,twocolumn
+%% for a journal layout:
+%% \documentclass[final,1p,times]{elsarticle}
+%% \documentclass[final,1p,times,twocolumn]{elsarticle}
+%% \documentclass[final,3p,times]{elsarticle}
+%% \documentclass[final,3p,times,twocolumn]{elsarticle}
+%% \documentclass[final,5p,times]{elsarticle}
+%% \documentclass[final,5p,times,twocolumn]{elsarticle}
+
+%% The graphicx package provides the includegraphics command.
+\usepackage{graphicx}
+%% The amssymb package provides various useful mathematical symbols
+% \usepackage[demo]{graphicx}
+\usepackage{bm,amssymb,amsmath,amsfonts,mathrsfs,stmaryrd,amssymb,mathtools,subfig,caption,float,minted,longtable,url}
+\usepackage[linesnumbered,lined,boxed,vlined,ruled]{algorithm2e}
+\usepackage[margin=1.05in]{geometry}
+\renewcommand{\baselinestretch}{1.3}
+%% The amsthm package provides extended theorem environments
+%% \usepackage{amsthm}
+
+%% The lineno packages adds line numbers. Start line numbering with
+%% \begin{linenumbers}, end it with \end{linenumbers}. Or switch it on
+%% for the whole article with \linenumbers after \end{frontmatter}.
+\usepackage{lineno}
+
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{corollary}{Corollary}[theorem]
+\newtheorem{lemma}[theorem]{Lemma}
+
+%% natbib.sty is loaded by default. However, natbib options can be
+%% provided with \biboptions{...} command. Following options are
+%% valid:
+
+%%   round  -  round parentheses are used (default)
+%%   square -  square brackets are used   [option]
+%%   curly  -  curly braces are used      {option}
+%%   angle  -  angle brackets are used    <option>
+%%   semicolon  -  multiple citations separated by semi-colon
+%%   colon  - same as semicolon, an earlier confusion
+%%   comma  -  separated by comma
+%%   numbers-  selects numerical citations
+%%   super  -  numerical citations as superscripts
+%%   sort   -  sorts multiple citations according to order in ref. list
+%%   sort&compress   -  like sort, but also compresses numerical citations
+%%   compress - compresses without sorting
+%%
+%% \biboptions{comma,round}
+
+% \biboptions{}
+
+\journal{Journal Name}
+
+\begin{document}
+
+\begin{frontmatter}
+
+%% Title, authors and addresses
+
+\title{STAT4402 Tutorial}
+
+\author{Michael Ciccotosto-Camp}
+
+\address{University of Queensland}
+
+% \begin{abstract}
+% Programs which find the Longest Common Substring (LCS) are employed many areas of scientific endeavour; most notably in bio-informatics and computer science. In this report a Dynamic bottom-up algorithm is implemented (in \texttt{main.c}) to find the LCS of two strings in the {\it C} programming language. The most effective optimizations found to decrease run-time included using 1D matrices, conservative subroutine calling, loop-interchanging and loop-unrolling
+% \end{abstract}
+
+\end{frontmatter}
+
+\input{introduction.tex}
+
+\input{KNN_theory.tex}
+
+% SGD theory
+
+% Log onto HPC w/ examples
+
+% Questions
+
+% Answers
+
+% References
+
+%% References without bibTeX database:
+
+\bibliographystyle{model1-num-names}
+\bibliography{bib_ref}
+
+\end{document}

@@ -50,4 +50,25 @@
     \[
         \bm{w}_{i} = S_{T_{i}} \left( \bm{w_{g}} \right) + M_{T_{i}} \left( \bm{w}_{g} \right) \cdot \left( \bm{w}_{i-1} - \bm{w}_{g} \right)
     \]
+    \item The algorithm for parallel SGD is summaries below
 \end{itemize}
+
+\begin{algorithm}[ht!!!]
+    \caption{Parallel SGD}
+    \label{alg:parallel-SGD}
+    \footnotesize
+    \SetAlgoLined
+        \SetKwInOut{Input}{input}\SetKwInOut{Output}{output}
+        \Input{Training data $T$, an initial weight vector $\bm{w}_{g}$ and the number of processes to perform the algorithm $p$}
+        \Output{Updated weight vector}
+        \BlankLine
+        $\left\lbrace T_{1} , T_{2}, \ldots , T_{p} \right\rbrace \gets$ an equal partition of $T$\;
+        \For{$T_{i} \in \left\lbrace T_{1} , T_{2}, \ldots , T_{p} \right\rbrace$ {\bf concurrently}}{
+            Compute $S_{T_{i}} \left( \bm{w_{g}} \right)$ and $M_{T_{i}} \left( \bm{w}_{g} \right)$\;
+        }
+        \For{$i \in \left\lbrace 1,2, \ldots , p \right\rbrace$}{
+            $\bm{w}_{i} \gets S_{T_{i}} \left( \bm{w_{g}} \right) + M_{T_{i}} \left( \bm{w}_{g} \right) \cdot \left( \bm{w}_{i-1} - \bm{w}_{g} \right)$\;
+        }
+        \KwResult{$\bm{w}_{p}$}
+        \BlankLine
+    \end{algorithm}

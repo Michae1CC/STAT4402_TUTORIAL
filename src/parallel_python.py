@@ -72,7 +72,7 @@ def parallel_array_sum(array, threads):
 
     for thread_ref in thread_refs:
 
-        # Wait to each thread to finish and collect their result using join
+        # Wait for each thread to finish
         thread_ref.join()
         local_thread_sum = global_queue.get()
 

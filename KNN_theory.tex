@@ -15,7 +15,7 @@
     \item When a unknown sample $\bm{x}$ is to be classified, a k-NN classifier computes the distance between $\bm{x}$ and the other points within the training set $T$. The training data is then sorted by distance and the $k^{th}$ closests training samples are then used to predict $\bm{x}$.
     \item A simple K-NN algorithm works as follows
 \end{itemize}
-\begin{algorithm}[ht!]
+\begin{algorithm}[ht!!!]
 \caption{Serial k-NN}
 \label{alg:serial-k-NN}
 \footnotesize
@@ -37,7 +37,7 @@
     \item CITATION takes advantage of this independence to have distance computation carried out on different processes.
 \end{itemize}
 
-\begin{algorithm}[ht!]
+\begin{algorithm}[ht!!!]
 \caption{Parallel k-NN}
 \label{alg:parallel-k-NN}
 \footnotesize
@@ -56,7 +56,7 @@
     \BlankLine
 \end{algorithm}
 This algorithm is shown pictorially below
-\begin{figure}[h]
+\begin{figure}[h!!!]
     \captionsetup[subfigure]{labelformat=empty}
     \centering
     \subfloat[]{

@@ -5,4 +5,195 @@
     \item While commercial bought laptops usually have more than one core in them, their usage is taken up by processes running in the background, so if you ran anyone of these algorithms on your own machine, chances are you won't see much of an improvement in performace
     \item You might be asking now, {\it what sort of computers can run these algorithms to actually see performance improvements?} Well I'm glad you asked! The answer {High Performance Computers}. High Performance Computers (or just HPCs) are very large machines consisting of hundereds or even thousands of cores to run scientific or analytic programs on. The processes on HPCs are monitored by a special operating system so that any jobs that you submit to be run of a HPC gets exactly the number of processes and amount of memory you've asked for (provided that HPC system is able to provide those resources).
     \item As a student taking STAT4402 you should have access to UQ's \texttt{getafix} HPC.
+    \item To log into \texttt{getafix} we can simply \texttt{ssh} via terminal (you will need to be on campus to do this or use a VPN).
 \end{itemize}
+\begin{minted}[mathescape,
+    frame=lines,
+    framesep=2mm]{bash}
+root@MSI~$ ssh s4430291@getafix.smp.uq.edu.au
+Password:
+Last login: Wed Sep  2 07:52:58 2020 from moss.labs.eait.uq.edu.au
+Quickstart information: http://research.smp.uq.edu.au/computing/getafix.html
+
+By having an account on getafix you will automatically be added
+to the smp-hpc Notifications, Questions, Answers email list
+   mailto:smp-hpc@lists.science.uq.edu.au
+If you choose to remove yourself from the email list via
+  http://lists.smp.uq.edu.au/mailman/listinfo/smp-hpc
+your getafix access will be discontinued.
+
+                 used  quota
+/home/s4430291  1.80G    50G
+/data/s4430291   512B   500G
+
+
+s4430291@fac-login-0~$
+\end{minted}
+
+\begin{itemize}
+    \item If you're working you'll need to run a few commands before we can start coding. \texttt{getafix} does not have many python libraries installed for users, so we will need to install them ourselves
+\end{itemize}
+
+\begin{minted}[mathescape,
+    frame=lines,
+    framesep=2mm]{bash}
+pip install numpy --user
+pip install sklearn --user
+\end{minted}
+
+We can start by creating a folder to put all of our code in, changing to that directory and creating our first python file using vim.
+
+\begin{minted}[mathescape,
+    frame=lines,
+    framesep=2mm]{bash}
+~$mkdir STAT4402_tut
+
+~$cd STAT4402_tut/
+
+~/STAT4402_tut$pwd
+/home/s4430291/STAT4402_tut
+
+~/STAT4402_tut$touch parallel_sum.py
+
+~/STAT4402_tut$ls
+parallel_sum.py
+
+~/STAT4402_tut$vim parallel_sum.py
+\end{minted}
+
+If you're unsure of what any of these commands do, you can simply look that the manual page for that command by type \texttt{man} followed by the command into your terminal. For example \texttt{man mkdir} will bring up the manual page for the \texttt{mkdir} command used above. As simple example, let's populated our newly created \texttt{parallel\_sum.py} with a python script that will sum together the contents of a numpy array in parallel.
+
+\begin{minted}[mathescape,
+    linenos,
+    numbersep=5pt,
+    frame=lines,
+    framesep=2mm]{python}
+#!/usr/bin/env python3
+
+__author__ = 'Michael Ciccotosto-Camp'
+
+import threading
+import queue
+import numpy as np
+
+
+def slave_sum(array, global_queue):
+    """
+    Computes the sum of a given array.
+
+    Parameters:
+        array:
+            A numpy array to sum over.
+
+        global_queue:
+            A queue to push the result of our slave process.
+
+    Returns:
+        The local sum of the input array.
+    """
+
+    # Compute the local sum for this thread
+    local_sum = np.sum(array)
+
+    # Push our local sum onto the global queue to be retrieve by the
+    # master process
+    global_queue.put(local_sum)
+
+    return
+
+
+def parallel_array_sum(array, threads):
+    """
+    Computes the sum of a given array in parallel.
+
+    Parameters:
+        Parameters:
+            array:
+                A numpy array to sum over.
+
+            threads:
+                The number of thread to use.
+
+    Returns:
+        The sum of the array elements.
+    """
+
+    # Split the array into t equal partitions, where t is the number of threads
+    partitions = np.array_split(array, threads)
+
+    # Keep a reference to the threads we've spawned
+    thread_refs = []
+
+    # The results for each thread need to be put on a global queue since we
+    # can't retrieve from join with using higher level threading API
+    global_queue = queue.Queue()
+
+    # Create a global sum to store
+    global_sum = 0
+
+    for partition in partitions:
+
+        new_thread = threading.Thread(
+            target=slave_sum, args=(partition, global_queue))
+        thread_refs.append(new_thread)
+
+        # Get that new thread to work!
+        new_thread.start()
+
+    for thread_ref in thread_refs:
+
+        # Wait for each thread to finish
+        thread_ref.join()
+        local_thread_sum = global_queue.get()
+
+        # Add the local thread sum to our global sum
+        global_sum += local_thread_sum
+
+    return global_sum
+
+
+def main():
+
+    # Create a randomly generated vector of length 10000
+    array_to_sum = np.random.rand(10000)
+
+    array_sum = parallel_array_sum(array_to_sum, 4)
+
+    print("Array sum is: ", array_sum)
+
+
+if __name__ == '__main__':
+    main()
+\end{minted}
+
+You can exit out of vim by pressing \texttt{ctrl+c}, then typing \texttt{:wq} into the prompt at the bottom and then hitting enter. This is great but how do we submit this script to be executed by the HPC. It wouldn't make sense to execute it in the login node we are current in since we wouldn't be enjoying the immense computing power offered by the HPC. To submit jobs to the HPC we need to create a job file, commonly refereed to as a batch file, which specifies a whole bunch of parameters and conditions that the HPC will use to run our code, including how many cores to use, how much memory to use, what programs to execute, where to put the output etc. An example batch file to run our \texttt{parallel\_python.py} file is shown below.
+\begin{minted}[mathescape,
+    linenos,
+    numbersep=5pt,
+    frame=lines,
+    framesep=2mm]{bash}
+#!/bin/bash
+#SBATCH --job-name=parallel_python
+#SBATCH --output=/home/s4430291/STAT4402_tut/parallel_python.out
+#SBATCH --error=/home/s4430291/STAT4402_tut/parallel_python.err
+#SBATCH --time=0-0:05
+#SBATCH --mem=1GB
+#SBATCH --nodes=1
+#SBATCH --cpus-per-task=4
+
+export OMP_NUM_THREADS=4
+
+DATE=$(date +"%Y%m%d%H%M")
+echo "time started  "$DATE
+echo "This is job '$SLURM_JOB_NAME' (id: $SLURM_JOB_ID) running on the following nodes:"
+echo $SLURM_NODELIST
+echo "running with SLURM_TASKS_PER_NODE= $SLURM_TASKS_PER_NODE "
+echo "running with SLURM_NTASKS total  = $SLURM_NTASKS "
+export TIMEFORMAT="%E sec"
+
+python3 /home/s4430291/STAT4402_tut/parallel_python.py
+
+DATE=$(date +"%Y%m%d%H%M")
+echo "time finished "$DATE
+\end{minted}
+Saving this batch file as \texttt{parallel\_python\_batch.sh} we can submit to our job to the HPC.

@@ -24,3 +24,25 @@ language = {eng},
 author = {Shenshen Liang and Ying Liu and Cheng Wang and Liheng Jian},
 keywords = {Instruction sets ; Computational modeling ; Programming ; Classification algorithms ; Kernel ; Graphics processing unit ; Nearest neighbor searches},
 }
+
+@article{MalekiSaeed2017PSGD,
+abstract = {Stochastic gradient descent (SGD) is a well known method for regression and
+classification tasks. However, it is an inherently sequential algorithm at each
+step, the processing of the current example depends on the parameters learned
+from the previous examples. Prior approaches to parallelizing linear learners
+using SGD, such as HOGWILD! and ALLREDUCE, do not honor these dependencies
+across threads and thus can potentially suffer poor convergence rates and/or
+poor scalability. This paper proposes SYMSGD, a parallel SGD algorithm that, to
+a first-order approximation, retains the sequential semantics of SGD. Each
+thread learns a local model in addition to a model combiner, which allows local
+models to be combined to produce the same result as what a sequential SGD would
+have produced. This paper evaluates SYMSGD's accuracy and performance on 6
+datasets on a shared-memory machine shows upto 11x speedup over our heavily
+optimized sequential baseline on 16 cores and 2.2x, on average, faster than
+HOGWILD!.},
+year = {2017},
+title = {Parallel Stochastic Gradient Descent with Sound Combiners},
+copyright = {http://arxiv.org/licenses/nonexclusive-distrib/1.0},
+language = {eng},
+author = {Maleki, Saeed and Musuvathi, Madanlal and Mytkowicz, Todd},
+}

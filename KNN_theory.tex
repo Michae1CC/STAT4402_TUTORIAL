@@ -43,19 +43,26 @@ While this method is simple, computing the distance between $\bm{x}$ and each $\
     \KwResult{$\overline{y} \left( \bm{x} \right)$}
     \BlankLine
 \end{algorithm}
-This algorithm is shown pictorially below
-\begin{figure}[h!!!]
-    \captionsetup[subfigure]{labelformat=empty}
-    \centering
-    \subfloat[]{
-        \includegraphics[scale=0.5]{img/STAT4402_tut_KNN_1.png}
-    }
-    \subfloat[]{
-        \includegraphics[scale=0.5]{img/STAT4402_tut_KNN_2.png}
-    }
-    \quad
-    \subfloat[]{
-        \includegraphics[scale=0.7]{img/STAT4402_tut_KNN_3.png}
-    }
-    \label{fig:STAT4402_tut_KNN}
-\end{figure}
+
+This algorithm is shown pictorially below\\
+\renewcommand{\labelenumi}{\textbf{Step \arabic{enumi})}}
+\begin{enumerate}
+    \item Partition the data and send partitions to processes \(P_{1}, P_{2}, P_{3}, P_{4}\)
+    \begin{figure}[H]
+        \includegraphics[scale=0.8]{img/STAT4402_tut_KNN_1_no_cap.png}
+        \centering
+    \end{figure}
+    
+    \item Determine the closest samples within each process
+    \begin{figure}[H]
+        \includegraphics[scale=0.8]{img/STAT4402_tut_KNN_2_no_cap.png}
+        \centering
+    \end{figure}
+    
+    \item Collect the \(k^{th}\) closest samples and order them in the master node get the global
+\(k^{th}\) closest samples
+    \begin{figure}[H]
+        \includegraphics[scale=0.7]{img/STAT4402_tut_KNN_3_no_cap.png}
+        \centering
+    \end{figure}
+\end{enumerate}

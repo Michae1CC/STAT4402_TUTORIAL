@@ -28,10 +28,6 @@ We will introduce the notation $M_{D} \triangleq S_{T}'$ as the model combiner. 
 \[
     M_{D} (\bm{w}) = \prod_{i=1}^{n} \left( \bm{I} - \eta_{i} \cdot H_{z_{i}} \left( S_{T_{i-1}} \left( \bm{w} \right) \right) \right)
 \]
-where $S_{T_{0}} \left( \bm{w} \right) = \bm{w}$. This result can be easily shown by applying the chain rule to $S_{T} \left( \bm{w} \right) = S_{T_{n}} \left( S_{T_{n-1}} \left( \ldots \left( S_{1} \left( \bm{w} \right) \right) \right) \right)$. We will introduce the notation $M_{D} \triangleq S_{T}'$ as the model combiner. In the equation above the model combiner captures the first order information of how a change in $\Delta \bm{w}$ will effect the SGD. When $\Delta \bm{w}$ is sufficiently small, one can neglect higher order terms and only use the model combiner to combine models from different processes. From \cite{MalekiSaeed2017PSGD} we can show that for a sequence of input examples $z_1 , z_2, \ldots , z_{n}$ the model combiner can be computed as
-\[
-    M_{D} (\bm{w}) = \prod_{i=1}^{n} \left( \bm{I} - \eta_{i} \cdot H_{z_{i}} \left( S_{T_{i-1}} \left( \bm{w} \right) \right) \right)
-\]
 where $S_{T_{0}} \left( \bm{w} \right) = \bm{w}$. This result can be easily shown by applying the chain rule to $S_{T} \left( \bm{w} \right) = S_{T_{n}} \left( S_{T_{n-1}} \left( \ldots \left( S_{1} \left( \bm{w} \right) \right) \right) \right)$.\\[1\baselineskip]
 Thus to create a parallelized SGD, each of the $p$ processors start with the same initial global weight vector $\bm{w}_{g}$ to compute its local model $S_{T_i} \left( \bm{w}_{g} \right)$ and model combiner $M_{T_{i}} \left( \bm{w}_{g} \right)$ in parallel. A subsequent reduction phase computes $\bm{w}_{i}$ by adjusting the input of processor $i$ by adjusting by the staleness introduced in the $i-1$ processor
 \[

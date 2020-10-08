@@ -75,19 +75,70 @@ An example batch file for job submission is shown below
     linenos,
     numbersep=5pt,
     frame=lines,
-    framesep=2mm]{bash}{src/batch/KNN_1_thread.sh}
+    framesep=2mm]{bash}{src/batch/PERCEPTRON_1_thread.sh}
     
-Code to training a parallel k-NN algorithm using \texttt{sklearn} is given below
+Code to training a parallel perceptron algorithm using \texttt{sklearn} is given below
 \inputminted[mathescape,
     linenos,
     numbersep=5pt,
     frame=lines,
-    framesep=2mm]{python}{src/KNN_demo.py}
+    framesep=2mm]{python}{src/PERCEPTRON_demo.py}
     
 The times for running the parallel algorithm with different numbers of processes is shown below
 \begin{table}[h!!!]
 \begin{tabular}{l|c|c|c|c}
 Number of threads & 1 & 2 & 3 & 4 \\ \cline{2-5} 
-Time (sec)        & $0.03754734$ & $0.02993416$ & $0.0252390$ & $0.01833604$
+Time (sec)        & $0.23677158$ & $0.25240182$ & $0.216248750$ & $0.15046286$
 \end{tabular}
 \end{table}
+
+\subsection*{{\bf Q2)}}
+\subsubsection*{{\bf a)}}
+We know that a single prediction with a single sample for a linear regression has the form
+\[
+    \overline{y} (\bm{x}) = \bm{x}_{i} \bm{w}
+\]
+where $\bm{x}_{i}$ include a fixed $1$ in the first position to allow for a bias term. The squared loss for a single prediction is then
+\[
+    C_{z_{i}} (\bm{w}) = \frac{1}{2} \norm{\bm{x}_{i} \bm{w} - \bm{y}_{i}}^2
+\]
+We can compute $G_{z_{i}}$ as
+\begin{align*}
+    G_{z_{i}} (w) &= \frac{\partial}{\partial x} C_{z_{i}} (w) \\
+    &= \frac{\partial}{\partial \bm{w}} \left\langle \bm{x}_{i} \bm{w} - \bm{y}_{i}, \bm{x}_{i} \bm{w} - \bm{y}_{i} \right\rangle \\
+    &= \frac{1}{2} \left[ (\bm{x}_{i} \bm{w})^{\top} (\bm{x}_{i} \bm{w}) - 2 \bm{y}_{i}^{\top} \bm{x}_{i} \right]
+\end{align*}
+The hessian $H_{z_{i}}$ may then be computed as
+\begin{align*}
+    H_{z_{i}} (w) &= \frac{\partial}{\partial x} G_{z_{i}} (w) \\
+    &= \frac{\partial}{\partial \bm{w}} \frac{1}{2} \left[ (\bm{x}_{i} \bm{w})^{\top} (\bm{x}_{i} \bm{w}) - 2 \bm{y}_{i}^{\top} \bm{x}_{i} \right] \\
+    &= \bm{x}_{i}^{\top} \bm{x}_{i}
+\end{align*}
+Since $H_{z_{i}} (\bm{w})$ is constant with respect to $\bm{w}$, our combiner matrix simply becomes
+\[
+    \prod_{i=1}^{n} \left( \bm{I} - \eta_{i} \bm{x}_{i}^{\top} \bm{x}_{i} \right)
+\]
+
+\subsubsection*{{\bf b)}}
+We know that
+\[
+    S_{T} \left( \bm{w} \right) = S_{T_{n}} \left( S_{T_{n-1}} \left( \ldots \left( S_{1} \left( \bm{w} \right) \right) \right) \right)
+\]
+and
+\[
+    \bm{w}_{t+1} = \bm{w}_{t} - \eta_{t} G_{z_{j}} \left( \bm{w}_{t} \right)
+\]
+Applying the chain rule to the former expression
+\begingroup
+\allowdisplaybreaks
+\begin{align*}
+    M_{T} \left( \bm{w} \right) &= \frac{\partial}{\partial \bm{w}} ( S_{T_{n}} \left( \bm{w} \right) ) \\
+    &= \frac{\partial}{\partial \bm{w}} ( S_{z_{n}} ( S_{z_{n-1}} ( \ldots ( S_{z_{2}} (S_{z_{1}} ( \bm{w} )) ))  ) ) \\
+    &= \frac{\partial}{\partial \bm{w}} ( S_{z_{n}} ( S_{z_{n-1}} ( \ldots ( S_{z_{2}} ( \bm{w} - \eta_{1} G_{z_{1}} \left( \bm{w} \right) ) ))  ) ) \\
+    &= (\bm{I} - \eta_{1} H_{z_{1}} (\bm{w})) \cdot \frac{\partial}{\partial \bm{S}_{T_{1}} (w)} ( S_{z_{n}} ( S_{z_{n-1}} ( \ldots ( S_{z_{2}} (S_{z_{1}} ( \bm{w} )) ))  ) ) \\
+    &= (\bm{I} - \eta_{1} H_{z_{1}} (\bm{w})) \cdot (\bm{I} - \eta_{2} H_{z_{2}} (\bm{S}_{T_{1}} ( \bm{w} ))) \cdot \frac{\partial}{\partial \bm{S}_{T_{2}} (w)} ( S_{z_{n}} ( S_{z_{n-1}} ( \ldots ( S_{z_{2}} (S_{z_{1}} ( \bm{w} )) ))  ) ) \\
+    &\vdots \\
+    &= \prod_{i=1}^{n} \left( \bm{I} - \eta_{i} \cdot H_{z_{i}} \left( S_{T_{i-1}} \left( \bm{w} \right) \right) \right)
+\end{align*}
+\endgroup
+as wanted.

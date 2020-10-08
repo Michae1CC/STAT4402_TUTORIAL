@@ -1,22 +1,17 @@
 \section{Parallel Multiclass Perceptron}
 
-\begin{itemize}
-    \item Similar to a definition is class the perception is an algorithm that uses an affine function as a threshold boundary to classify real valued feature vectors
-    \item The output of a perceptron is simply given as
-    \[
-        f(\mathbf{x})=\left\{\begin{array}{ll}
-        1 & \text { if } \mathbf{w} \cdot \mathbf{x}+b>0 \\
-        0 & \text { otherwise }
-        \end{array}\right.
-    \]
-    where $\bm{w} \in \mathbb{R}^{m}$ with $b$ acting as a bias
-    \item A simple generalisation we can make to the perceptron is to allow the perceptron to predict from more than just two classes. This is known as the {\it multiclass perceptron}. A feature representation function maps a feature vector and its correspond label to a real valued vector. This output vector is then dot-producted with  a weight vector $\bm{w}$, similar to the norm perceptron. The prediction value of an unknown feature vector for the multiclass perceptron can be computed as
-    \[
-        \overline{y} \left( \bm{x} \right) = \underset{y}{\arg \min } \bm{w} \cdot f(\bm{x}, y)
-    \]
-    \item The iterative procedure to create our weight vector from the training set is also similar, although this time if we make an incorrect prediction we move the weight vector in the direction of $f(\bm{x}, y) - f(\bm{x}, \overline{y})$.
-    \item Algorithm for the serial multiclass perceptron is shown in algorithm \ref{alg:serial-perceptron}. Note, for the sake of simplicity a learning rate parameter has been omitted with in the training algorithm
-\end{itemize}
+Similar to a definition is class the perception is an algorithm that uses an affine function as a threshold boundary to classify real valued feature vectors. The output of a perceptron is simply given as
+\[
+    f(\mathbf{x})=\left\{\begin{array}{ll}
+    1 & \text { if } \mathbf{w} \cdot \mathbf{x}+b>0 \\
+    0 & \text { otherwise }
+    \end{array}\right.
+\]
+where $\bm{w} \in \mathbb{R}^{m}$ with $b$ acting as a bias. A simple generalisation we can make to the perceptron is to allow it to predict more than just two classes. This is known as the {\it multiclass perceptron} \cite{HastieTrevor2009EoSL}. A feature representation function maps a feature vector and its correspond label to a real valued vector. This output vector is then dot-producted with  a weight vector $\bm{w}$, similar to the 'two-class' perceptron. The prediction value of an unknown feature vector for the multi-class perceptron can be computed as
+\[
+    \overline{y} \left( \bm{x} \right) = \underset{y}{\arg \min } \; \bm{w} \cdot f(\bm{x}, y)
+\]
+The iterative procedure to create our weight vector from the training set is also similar, although this time if we make an incorrect prediction we move the weight vector in the direction of $f(\bm{x}, y) - f(\bm{x}, \overline{y})$ \cite{HastieTrevor2009EoSL}. The algorithm for the serial multi-class perceptron is shown in Algorithm \ref{alg:serial-perceptron}. Note, for the sake of simplicity a learning rate parameter has been omitted within the training algorithm.
 \begin{algorithm}[ht!!!]
     \caption{Serial Multiclass Perceptron}
     \label{alg:serial-perceptron}
@@ -31,7 +26,7 @@
     
         \For{$\left( \bm{x}_{i}, y_{i} \right) \in T$}{
         
-            $\overline{y} \gets \underset{y}{\arg \min } \bm{w}^{(k)} \cdot f(\bm{x}, y)$\;
+            $\overline{y} \gets \underset{y}{\arg \min } \; \bm{w}^{(k)} \cdot f(\bm{x}, y)$\;
             $k \gets k+1$\;
             
             \uIf{$\overline{y} \neq y$}{
@@ -42,9 +37,7 @@
     \KwResult{$\bm{w}^{(k)}$}
     \BlankLine
 \end{algorithm}
-\begin{itemize}
-    \item One obvious way to parallize the algorithm from \ref{alg:serial-perceptron} is to split the training set $T$ into $p$ partitions. One can then train an initial weight on each of these partitions independently on the $p$ processes and then take a weighted mixture of the weights from each of the different processes. The mixture coefficents will be given as the vector $\bm{\mu}$ where $\mu_{i} \geq 0$ and $\sum_{i} \mu_{i} = 1$. Algorithm for this naive parallel multiclass perceptron is shown in algorithm \ref{alg:serial-perceptron}.
-\end{itemize}
+One obvious way to parallise Algorithm \ref{alg:serial-perceptron} is to split the training set $T$ into $p$ partitions. One can then train an initial weight on each of these partitions independently on the $p$ processes and then take a weighted mixture of the weights from each of the different processes \cite{10.5555/1857999.1858068}. The mixture coefficents will be given as the vector $\bm{\mu}$ where $\mu_{i} \geq 0$ and $\sum_{i} \mu_{i} = 1$. Pseudo-code for this naive parallel multi-class perceptron is shown in Algorithm \ref{alg:serial-perceptron}.
 \begin{algorithm}[ht!!!]
     \caption{Naive Parallel Multiclass Perceptron}
     \label{alg:naive-parallel-perceptron}
@@ -65,13 +58,7 @@
     \KwResult{$\bm{w}$}
     \BlankLine
 \end{algorithm}
-\begin{itemize}
-    \item While \ref{alg:naive-parallel-perceptron} is easily understood and makes effective use of parallel resources without incurring too much over-head in inter-process communication, there is one large shortcoming of this algorithm. Even for linearly separable datasets $T$, algorithm \ref{alg:naive-parallel-perceptron} does not always converge to a separating hyperplane.
-    \item In fact in Question ??? you yourself will be asked to provide a linearly separable dataset for which algorithm \ref{alg:naive-parallel-perceptron} will not converge.
-    \item To salvage this parallel algorithm we can make sure each processors is communicating its results before finalization.
-    \item That is we can collect weights from processors after each single epoch, mix these the weights together and then redistribute this new weight vector to our processes again for a new epoch.
-    \item This new iterative parameter mixing idea is shown in algorithm.
-\end{itemize}
+While Algorithm \ref{alg:naive-parallel-perceptron} is easy to understand and makes effective use of parallel resources without incurring too much over-head in inter-process communication, it has one large shortcoming. Even for linearly separable data sets $T$, algorithm \ref{alg:naive-parallel-perceptron} does not always converge to a separating hyperplane. In fact in Question {\bf 2b} you will be asked to provide a linearly separable data set for which algorithm \ref{alg:naive-parallel-perceptron} will not converge. To salvage this parallel algorithm we can make sure each process is communicating there results more often before finalizing $\bm{w}$. That is we can collect weights from processors after each single epoch, mix these the weights together and then redistribute this new weight vector to our processes again for a new epoch \cite{10.5555/1857999.1858068}. This new iterative parameter mixing idea is shown in Algorithm \ref{alg:parallel-perceptron}.
 \begin{algorithm}[ht!!!]
     \caption{Parallel Multiclass Perceptron}
     \label{alg:parallel-perceptron}
@@ -102,7 +89,7 @@
     $\bm{w} \gets \bm{w}^{(0)}$\;
     \For{$\left( \bm{x}_{i}, y_{i} \right) \in T_{i}$}{
         
-        $\overline{y} \gets \underset{y}{\arg \max } \; \bm{w}^{(k)} \cdot f(\bm{x}, y)$\;
+        $\overline{y} \gets \underset{y}{\arg \max } \; \bm{w}^{(k)} \cdot f(\bm{x}_{i}, y_{i})$\;
         
         \uIf{$\overline{y} \neq y$}{
             $\bm{w}^{(k+1)} \gets \bm{w}^{(k)} + f(\bm{x}_{i}, y_{i}) - f(\bm{x}_{i}, \overline{y})$\;
@@ -112,23 +99,20 @@
     \KwResult{$\bm{w}^{(k)}$}
     \BlankLine
 \end{algorithm}
-\begin{itemize}
-    \item The obvious and main drawback of algorithm \ref{alg:parallel-perceptron} over \ref{alg:naive-parallel-perceptron} this that there is much more inter-process communication overhead in reducing $\bm{w}^{(i,n)}$ and sending new values of $\bm{w}$.
-    \item However, we will see that algorithm \ref{alg:parallel-perceptron} will in fact converge for linearly separable training sets.
-    \item We can show this in the following Theorem.
-\end{itemize}
-{\bf Theorem} Assuming a training set $T$ is linearly separable by a margin $\lambda$, let $k_{i,n}$ be the number of mistakes that occur ed on partition $i$ of the training set during the $n^{th}$ epoch of training. For any $N$, when training a perception with fixed parameter mixing in algorithm \ref{alg:parallel-perceptron}
+The obvious and main drawback of algorithm \ref{alg:parallel-perceptron} over \ref{alg:naive-parallel-perceptron} this that there is much more inter-process communication overhead in reducing $\bm{w}^{(i,n)}$ and sending new values of $\bm{w}$. However, we will see that algorithm \ref{alg:parallel-perceptron} will in fact always converge for linearly separable training sets. We can show this in the following theorem:
+\newpage
+{\bf Theorem: } {\it Assuming a training set $T$ is linearly separable by a margin $\lambda$, let $k_{i,n}$ be the number of mistakes that occur ed on partition $i$ of the training set during the $n^{th}$ epoch of training. For any $N$, when training a perception with fixed parameter mixing in Algorithm \ref{alg:parallel-perceptron}}. \cite{10.5555/1857999.1858068}
 \[
     \sum_{n=1}^{N} \sum_{i=1}^{S} \mu_{i,n} k_{i,n} \leq \frac{R^{2}}{\lambda^2}
 \]
-Using some notation from before, let $\bm{w}^{(i,n)}$ be the weight acquired on the $n^{th}$ epoch of training by process $i$ and let $\bm{w}^{(i,n)-k}$ be the weight vector for process $i$ $k$ iterations back. Let $\bm{w}^{(avg,n)}$ be the weighted mixture weight for the $n^{th}$ epoch, that is
+Borrowing some notation from before, let $\bm{w}^{(i,n)}$ be the weight acquired on the $n^{th}$ epoch of training by process $i$ and let $\bm{w}^{([i,n]-k)}$ be the weight vector for $\text{process}-i$, $k$ iterations back. Let $\bm{w}^{(avg,n)}$ be the weighted mixture weight for the $n^{th}$ epoch, that is
 \[
     \bm{w}^{(avg,n)} = \sum_{i=1}^{S} \mu_{i,n} \bm{w}^{(i,n)}
 \]
 we can easily enough show that
 \begin{equation}
     \label{eqn:R1}
-    \bm{u} \cdot \bm{w}^{(i,n)} \leq \bm{u} \cdot \bm{w}^{(avg,n-1)} + k_{i,n} \lambda \tag{R1}
+    \bm{u} \cdot \bm{w}^{(i,n)} \geq \bm{u} \cdot \bm{w}^{(avg,n-1)} + k_{i,n} \lambda \tag{R1}
 \end{equation}
 and
 \begin{equation}
@@ -138,32 +122,32 @@ and
 Using \ref{eqn:R1} and \ref{eqn:R2} we can inductively show the following results
 \begin{equation}
     \label{eqn:H1}
-    \bm{u} \cdot \bm{w}^{(i,n)} \geq \sum_{n=1}^{N} \sum_{i=1}^{S} \mu_{(i,n)} k_{i,n} \lambda \tag{H1}
+    \bm{u} \cdot \bm{w}^{(avg,n)} \geq \sum_{n=1}^{N} \sum_{i=1}^{S} \mu_{i,n} k_{i,n} \lambda \tag{H1}
 \end{equation}
 and
 \begin{equation}
     \label{eqn:H2}
     \norm{\bm{w}^{(i,n)}}^2 \leq \sum_{n=1}^{N} \sum_{i=1}^{S} \mu_{i,n} k_{i,n} R^2 \tag{H2}
 \end{equation}
-we can see that \ref{eqn:R1} implies $\norm{\bm{w}^{(i,n)}} \geq \sum_{n=1}^{N} \sum_{i=1}^{S} \mu_{i,n} k_{i,n} \lambda$ since $\bm{v} \cdot \bm{w} \leq \norm{\bm{u}} \norm{\bm{w}}$ by the Cauchy Schwarz inequality and $\norm{\bm{u}} = 1$. For the base case $\bm{w}^{(avg,1)}$. So using \ref{eqn:R1} and the fact that $\bm{w}^{(avg,0)} = 0$ and
+we can see that \ref{eqn:R1} implies $\norm{\bm{w}^{(i,n)}} \geq \sum_{n=1}^{N} \sum_{i=1}^{S} \mu_{i,n} k_{i,n} \lambda$ since $\bm{v} \cdot \bm{w} \leq \norm{\bm{u}} \norm{\bm{w}}$ (by the Cauchy Schwarz inequality) and $\norm{\bm{u}} = 1$. For the base case $\bm{w}^{(avg,1)}$, using \ref{eqn:R1} and the fact that $\bm{w}^{(avg,0)} = 0$ 
 \begin{align*}
     \bm{u} \cdot \bm{w}^{(avg,1)} = \sum_{i=1}^{S} \mu_{i,1} \bm{u} \cdot \bm{w}^{(i,1)} \geq \sum_{i=1}^{S} \mu_{i,1}  k_{i,n} \lambda
 \end{align*}
 To show \ref{eqn:H2}, the base case can be written as
 \begin{align*}
     \norm{\bm{w}^{(avg,1)}}^2 &= \norm{\sum_{i=1}^{S} \mu_{i,1}}^2 \bm{w}^{(i,1)} \\
-    &= \sum_{i=1}^{S} \mu_{i,1} \norm{\bm{w}^{(i,1)}}^{2} \\
-    &= \sum_{i=1}^{S} \mu_{i,1} k_{i,n} R^2
+    &\leq \sum_{i=1}^{S} \mu_{i,1} \norm{\bm{w}^{(i,1)}}^{2} \\
+    &\leq \sum_{i=1}^{S} \mu_{i,1} k_{i,n} R^2
 \end{align*}
-This expression is found by first applying Jensen's inequality followed by \ref{eqn:R2} as well as the fact that $\norm{\bm{w}^{(avg,0)}}^2 = 0$. Now considering the general case, $\norm{\bm{w}^{(avg,N)}}^2$
+This expression is found by first applying Jensen's inequality followed by \ref{eqn:R2} as well as the fact that $\norm{\bm{w}^{(avg,0)}}^2 = 0$. Now considering the $N^{th}$ case, $\norm{\bm{w}^{(avg,N)}}^2$
 \begingroup
 \allowdisplaybreaks
 \begin{align*}
     \bm{u} \cdot \bm{w}^{(avg,N)} &= \sum_{i=1}^{S} \mu_{i,N} \left( \bm{u} \cdot \bm{w}^{(i,N)} \right) \\
-    &\geq \sum_{i=1}^{S} \mu_{i,N} \left( \bm{u} \cdot \bm{w}^{(i,N-1)} + k_{i,N} \lambda \right) \tag{Using \ref{eqn:H1}} \\
-    &= \bm{u} \cdot \bm{w}^{(avg,N-1)} + \sum_{i=1}^{S} \mu_{i,N} \bm{u} \cdot \bm{w}^{(i,N-1)} k_{i,N} \lambda \\
-    &= \geq\left[\sum_{n=1}^{N-1} \sum_{i=1}^{S} \mu_{i, n} k_{i, n} \gamma\right]+\sum_{i=1}^{S} \mu_{i, N} k_{i, N} \\
-    &= \sum_{n=1}^{N} \sum_{i=1}^{S} \mu_{i, n} k_{i, n} \gamma
+    &\geq \sum_{i=1}^{S} \mu_{i,N} \left( \bm{u} \cdot \bm{w}^{(avg,N-1)} + k_{i,N} \lambda \right) \tag{Using \ref{eqn:H1}} \\
+    &= \bm{u} \cdot \bm{w}^{(avg,N-1)} + \sum_{i=1}^{S} \mu_{i,N} k_{i,N} \lambda \\
+    &\geq \left[\sum_{n=1}^{N-1} \sum_{i=1}^{S} \mu_{i, n} k_{i, n} \lambda\right]+\sum_{i=1}^{S} \mu_{i, N} k_{i, N} \\
+    &= \sum_{n=1}^{N} \sum_{i=1}^{S} \mu_{i, n} k_{i, n} \lambda
 \end{align*}
 \endgroup
 Which thusly proves \ref{eqn:H1}. To show the inductive case for \ref{eqn:H2} we have
@@ -171,7 +155,7 @@ Which thusly proves \ref{eqn:H1}. To show the inductive case for \ref{eqn:H2} we
 \allowdisplaybreaks
 \begin{align*}
     \left\|\mathbf{w}^{(\mathrm{avg}, N)}\right\|^{2} &\leq \sum_{i=1}^{S} \mu_{i, N}\left\|\mathbf{w}^{(i, N)}\right\|^{2} \\
-    &= \leq \sum_{i=1}^{S} \mu_{i, N}\left(\left\|\mathbf{w}^{(\mathrm{avg}, N-1)}\right\|^{2}+k_{i, N} R^{2}\right) \\
+    &\leq \sum_{i=1}^{S} \mu_{i, N}\left(\left\|\mathbf{w}^{(\mathrm{avg}, N-1)}\right\|^{2}+k_{i, N} R^{2}\right) \\
     &= \left\|\mathbf{w}^{(\mathrm{avg}, N-1)}\right\|^{2}+\sum_{i=1}^{S} \mu_{i, N} k_{i, N} R^{2} \\
     &\leq \left[\sum_{n=1}^{N-1} \sum_{i=1}^{S} \mu_{i, n} k_{i, n} R^{2}\right]+\sum_{i=1}^{S} \mu_{i, N} k_{i, N} R^{2} \\
     &= \sum_{n=1}^{N} \sum_{i=1}^{S} \mu_{i, n} k_{i, n} R^{2}

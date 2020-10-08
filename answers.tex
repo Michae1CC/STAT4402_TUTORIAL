@@ -54,9 +54,9 @@ Examining line $6$ of Algorithm \ref{alg:one-perceptron-epoch} and knowing that 
 Again, using line $6$ of Algorithm \ref{alg:one-perceptron-epoch} and using the fact $\bm{w}^{([i,n] - 1)} \left( f (\bm{x}_{i}, y_{i}) -  f (\bm{x}_{i}, \overline{y}) \right) \leq 0$
 \begin{align*}
     \norm{\bm{w}^{(i,n)}}^2 &= \norm{\bm{w}^{([i,n] - 1)}}^2 + \norm{f (\bm{x}_{i}, y_{i}) -  f (\bm{x}_{i}, \overline{y})} + 2 \bm{w}^{([i,n] - 1)} \left( f (\bm{x}_{i}, y_{i}) -  f (\bm{x}_{i}, \overline{y}) \right) \\
-    &= \norm{\bm{w}^{([i,n] - 1)}}^2 + R^2 \\
-    &= \norm{\bm{w}^{([i,n] - 1)}}^2 + 2R^2 \\
-    &= \norm{\bm{w}^{([i,n] - 1)}}^2 + k_{i,n} R^2
+    &\leq \norm{\bm{w}^{([i,n] - 1)}}^2 + R^2 \\
+    &\leq \norm{\bm{w}^{([i,n] - 1)}}^2 + 2R^2 \\
+    &\leq \norm{\bm{w}^{([i,n] - 1)}}^2 + k_{i,n} R^2
 \end{align*}
 
 \subsubsection*{{\bf b)}}
@@ -67,24 +67,10 @@ Consider a binary classification setting where we have two classes $\left\{ 0,1 
     f (\bm{x}_{2,1}, 0) &= \left[ 0 \; 1 \; 1 \; 0 \; 0 \; 0 \right] \quad & f (\bm{x}_{2,1}, 1) &= \left[ 0 \; 0 \; 0 \; 0 \; 1 \; 1 \right] \\
     f (\bm{x}_{2,2}, 0) &= \left[ 1 \; 0 \; 0 \; 0 \; 0 \; 0 \right] \quad & f (\bm{x}_{2,2}, 1) &= \left[ 0 \; 0 \; 0 \; 1 \; 0 \; 0 \right]
 \end{align*}
-Assuming label $1$ as a tie-breaker we find that $\bm{w}^{1} = \left[ 1 \; 1 \; 0 \; -1 \; -1 \; 0 \right]$ and $\bm{w}^{2} = \left[ 0 \; 1 \; 1 \; 0 \; -1 \; -1 \right]$ for any choice of $\mu$ meaning the mixed weight vector will not separate at all points. If $\mu_1$ and $mu_2$ are both non-zero then all example will be classified as $0$. Furthermore if $\mu_1 = 1$ and $\mu_2 = 0$ then the training sample $(\bm{x}_{2,2}, y_{2,2})$ will be incorrectly classified as $0$. Similarly if $\mu_1 = 0$ and $\mu_2 = 1$ then the training sample $(\bm{x}_{2,2}, y_{2,2})$ will also be incorrectly classified as $0$. However, there is indeed a separating hyperplane for $T$ namely $\bm{w} = \left[ -1 \; 2 \; -1 \; 1 \; -2 \; 1 \right]$.
+Without loss of generality, assume label $1$ is assigned as a tie-breaker we find that $\bm{w}^{1} = \left[ 1 \; 1 \; 0 \; -1 \; -1 \; 0 \right]$ and $\bm{w}^{2} = \left[ 0 \; 1 \; 1 \; 0 \; -1 \; -1 \right]$ for any choice of $\bm{\mu}$ meaning the mixed weight vector will not separate at all points. If $\mu_1$ and $\mu_2$ are both non-zero then all example will be classified as $0$. Furthermore if $\mu_1 = 1$ and $\mu_2 = 0$ then the training sample $(\bm{x}_{2,2}, y_{2,2})$ will be incorrectly classified as $0$. Similarly if $\mu_1 = 0$ and $\mu_2 = 1$ then the training sample $(\bm{x}_{2,2}, y_{2,2})$ will also be incorrectly classified as $0$. However, there is indeed a separating hyperplane for $T$ namely $\bm{w} = \left[ -1 \; 2 \; -1 \; 1 \; -2 \; 1 \right]$.
 
 \subsubsection*{{\bf c)}}
-An example batch file for job submission is shown below
-\inputminted[mathescape,
-    linenos,
-    numbersep=5pt,
-    frame=lines,
-    framesep=2mm]{bash}{src/batch/PERCEPTRON_1_thread.sh}
-    
-Code to training a parallel perceptron algorithm using \texttt{sklearn} is given below
-\inputminted[mathescape,
-    linenos,
-    numbersep=5pt,
-    frame=lines,
-    framesep=2mm]{python}{src/PERCEPTRON_demo.py}
-    
-The times for running the parallel algorithm with different numbers of processes is shown below
+An example batch file for job submission can be found at the public git repo for this tutorial \url{https://github.com/Michae1CC/STAT4402_TUTORIAL} named as \texttt{PERCEPTRON\_1\_thread.sh} under \texttt{src/batch}. Code to training a parallel perceptron algorithm using \texttt{sklearn} can also be found at the public git repo for this tutorial named as \texttt{PERCEPTRON\_demo.py} under \texttt{src}. The times for running the parallel algorithm with different numbers of processes is shown below
 \begin{table}[h!!!]
 \begin{tabular}{l|c|c|c|c}
 Number of threads & 1 & 2 & 3 & 4 \\ \cline{2-5} 
@@ -104,14 +90,14 @@ where $\bm{x}_{i}$ include a fixed $1$ in the first position to allow for a bias
 \]
 We can compute $G_{z_{i}}$ as
 \begin{align*}
-    G_{z_{i}} (w) &= \frac{\partial}{\partial x} C_{z_{i}} (w) \\
+    G_{z_{i}} (\bm{w}) &= \frac{\partial}{\partial x} C_{z_{i}} (\bm{w}) \\
     &= \frac{\partial}{\partial \bm{w}} \left\langle \bm{x}_{i} \bm{w} - \bm{y}_{i}, \bm{x}_{i} \bm{w} - \bm{y}_{i} \right\rangle \\
-    &= \frac{1}{2} \left[ (\bm{x}_{i} \bm{w})^{\top} (\bm{x}_{i} \bm{w}) - 2 \bm{y}_{i}^{\top} \bm{x}_{i} \right]
+    &= \frac{1}{2} \left[ \bm{w}^{\top} \bm{x}_{i}^{\top} \bm{x}_{i} - 2 \bm{y}_{i}^{\top} \bm{x}_{i} \right]
 \end{align*}
 The hessian $H_{z_{i}}$ may then be computed as
 \begin{align*}
-    H_{z_{i}} (w) &= \frac{\partial}{\partial x} G_{z_{i}} (w) \\
-    &= \frac{\partial}{\partial \bm{w}} \frac{1}{2} \left[ (\bm{x}_{i} \bm{w})^{\top} (\bm{x}_{i} \bm{w}) - 2 \bm{y}_{i}^{\top} \bm{x}_{i} \right] \\
+    H_{z_{i}} (\bm{w}) &= \frac{\partial}{\partial x} G_{z_{i}} (\bm{w}) \\
+    &= \frac{\partial}{\partial \bm{w}} \frac{1}{2} \left[ \bm{w}^{\top} \bm{x}_{i}^{\top} \bm{x}_{i} - 2 \bm{y}_{i}^{\top} \bm{x}_{i} \right] \\
     &= \bm{x}_{i}^{\top} \bm{x}_{i}
 \end{align*}
 Since $H_{z_{i}} (\bm{w})$ is constant with respect to $\bm{w}$, our combiner matrix simply becomes
@@ -135,10 +121,21 @@ Applying the chain rule to the former expression
     M_{T} \left( \bm{w} \right) &= \frac{\partial}{\partial \bm{w}} ( S_{T_{n}} \left( \bm{w} \right) ) \\
     &= \frac{\partial}{\partial \bm{w}} ( S_{z_{n}} ( S_{z_{n-1}} ( \ldots ( S_{z_{2}} (S_{z_{1}} ( \bm{w} )) ))  ) ) \\
     &= \frac{\partial}{\partial \bm{w}} ( S_{z_{n}} ( S_{z_{n-1}} ( \ldots ( S_{z_{2}} ( \bm{w} - \eta_{1} G_{z_{1}} \left( \bm{w} \right) ) ))  ) ) \\
-    &= (\bm{I} - \eta_{1} H_{z_{1}} (\bm{w})) \cdot \frac{\partial}{\partial \bm{S}_{T_{1}} (w)} ( S_{z_{n}} ( S_{z_{n-1}} ( \ldots ( S_{z_{2}} (S_{z_{1}} ( \bm{w} )) ))  ) ) \\
-    &= (\bm{I} - \eta_{1} H_{z_{1}} (\bm{w})) \cdot (\bm{I} - \eta_{2} H_{z_{2}} (\bm{S}_{T_{1}} ( \bm{w} ))) \cdot \frac{\partial}{\partial \bm{S}_{T_{2}} (w)} ( S_{z_{n}} ( S_{z_{n-1}} ( \ldots ( S_{z_{2}} (S_{z_{1}} ( \bm{w} )) ))  ) ) \\
+    &= (\bm{I} - \eta_{1} H_{z_{1}} (\bm{w})) \cdot \frac{\partial}{\partial \bm{S}_{T_{1}} (\bm{w})} ( S_{z_{n}} ( S_{z_{n-1}} ( \ldots ( S_{z_{2}} (S_{z_{1}} ( \bm{w} )) ))  ) ) \\
+    &= (\bm{I} - \eta_{1} H_{z_{1}} (\bm{w})) \cdot (\bm{I} - \eta_{2} H_{z_{2}} (\bm{S}_{T_{1}} ( \bm{w} ))) \cdot \frac{\partial}{\partial \bm{S}_{T_{2}} (\bm{w})} ( S_{z_{n}} ( S_{z_{n-1}} ( \ldots ( S_{z_{2}} (S_{z_{1}} ( \bm{w} )) ))  ) ) \\
     &\vdots \\
     &= \prod_{i=1}^{n} \left( \bm{I} - \eta_{i} \cdot H_{z_{i}} \left( S_{T_{i-1}} \left( \bm{w} \right) \right) \right)
 \end{align*}
 \endgroup
 as wanted.
+
+\subsubsection*{{\bf c)}}
+An example batch file for job submission can be found at the public git repo for this tutorial \url{https://github.com/Michae1CC/STAT4402_TUTORIAL} named as \texttt{SGD\_batch.sh} under \texttt{src/batch}. Code to training a parallel perceptron algorithm using \texttt{sklearn} can also be found at the public git repo for this tutorial named as \texttt{SGD\_demo.py} under \texttt{src}.
+
+The times for running the parallel algorithm with different numbers of processes is shown below
+\begin{table}[h!!!]
+\begin{tabular}{l|c|c|c|c}
+Number of threads & 1 & 2 & 3 & 4 \\ \cline{2-5} 
+Time (sec)        & $0.18166565$ & $0.1362492375$ & $0.102186928$ & $0.076640196$
+\end{tabular}
+\end{table}

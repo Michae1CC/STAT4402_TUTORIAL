@@ -156,6 +156,8 @@ To show \ref{eqn:H2}, the base case can be written as
     &= \sum_{i=1}^{S} \mu_{i,1} k_{i,n} R^2
 \end{align*}
 This expression is found by first applying Jensen's inequality followed by \ref{eqn:R2} as well as the fact that $\norm{\bm{w}^{(avg,0)}}^2 = 0$. Now considering the general case, $\norm{\bm{w}^{(avg,N)}}^2$
+\begingroup
+\allowdisplaybreaks
 \begin{align*}
     \bm{u} \cdot \bm{w}^{(avg,N)} &= \sum_{i=1}^{S} \mu_{i,N} \left( \bm{u} \cdot \bm{w}^{(i,N)} \right) \\
     &\geq \sum_{i=1}^{S} \mu_{i,N} \left( \bm{u} \cdot \bm{w}^{(i,N-1)} + k_{i,N} \lambda \right) \tag{Using \ref{eqn:H1}} \\
@@ -163,7 +165,10 @@ This expression is found by first applying Jensen's inequality followed by \ref{
     &= \geq\left[\sum_{n=1}^{N-1} \sum_{i=1}^{S} \mu_{i, n} k_{i, n} \gamma\right]+\sum_{i=1}^{S} \mu_{i, N} k_{i, N} \\
     &= \sum_{n=1}^{N} \sum_{i=1}^{S} \mu_{i, n} k_{i, n} \gamma
 \end{align*}
+\endgroup
 Which thusly proves \ref{eqn:H1}. To show the inductive case for \ref{eqn:H2} we have
+\begingroup
+\allowdisplaybreaks
 \begin{align*}
     \left\|\mathbf{w}^{(\mathrm{avg}, N)}\right\|^{2} &\leq \sum_{i=1}^{S} \mu_{i, N}\left\|\mathbf{w}^{(i, N)}\right\|^{2} \\
     &= \leq \sum_{i=1}^{S} \mu_{i, N}\left(\left\|\mathbf{w}^{(\mathrm{avg}, N-1)}\right\|^{2}+k_{i, N} R^{2}\right) \\
@@ -171,6 +176,7 @@ Which thusly proves \ref{eqn:H1}. To show the inductive case for \ref{eqn:H2} we
     &\leq \left[\sum_{n=1}^{N-1} \sum_{i=1}^{S} \mu_{i, n} k_{i, n} R^{2}\right]+\sum_{i=1}^{S} \mu_{i, N} k_{i, N} R^{2} \\
     &= \sum_{n=1}^{N} \sum_{i=1}^{S} \mu_{i, n} k_{i, n} R^{2}
 \end{align*}
+\endgroup
 This shows \ref{eqn:H2}. Combining the results of \ref{eqn:H1} and \ref{eqn:H2} as well as the fact $\left\|\mathbf{w}^{(\operatorname{avg}, N)}\right\|>\mathbf{u} \cdot \mathbf{w}^{(\mathrm{avg}, N)}$
 \begin{align*}
     \left[\sum_{n=1}^{N} \sum_{i=1}^{S} \mu_{i, n} k_{i, n}\right]^{2} \gamma^{2} &\leq \left[\sum_{n=1}^{N} \sum_{i=1}^{S} \mu_{i, n} k_{i, n}\right] R^{2} \\

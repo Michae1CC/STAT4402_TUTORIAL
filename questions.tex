@@ -36,4 +36,10 @@
         
         \item Use \texttt{sklearn}s \texttt{Perceptron} class to train on the \textit{digits} data. Leave $\frac{1}{5}$ of the data aside to provide a test accuracy. Submit this script to \texttt{golith} using a job batch file. Use repeat training with $1-4$ threads and record your results. {\it Hint:} you will need to adjust the \texttt{n\_jobs} parameter in the \texttt{Perceptron} to change the number of threads used for running the perceptron algorithm.
     \end{enumerate}
+    
+    \item \begin{enumerate}
+        \item Find the expression for a combiner matrix for a standard linear regression with square loss.
+        \item Show that $M_{D} (\bm{w}) = \prod_{i=1}^{n} \left( \bm{I} - \eta_{i} \cdot H_{z_{i}} \left( S_{T_{i-1}} \left( \bm{w} \right) \right) \right)$.
+        \item Use \texttt{sklearn}s \texttt{SGDClassifier} class to train on the \textit{digits} data. Leave $\frac{1}{5}$ of the data aside to provide a test accuracy. Submit this script to \texttt{golith} using a job batch file. Use repeat training with $1-4$ threads and record your results. {\it Hint:} you will need to adjust the \texttt{n\_jobs} parameter in the \texttt{SGDClassifier} to change the number of threads used for running the perceptron algorithm.
+    \end{enumerate}
 \end{enumerate}

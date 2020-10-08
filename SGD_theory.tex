@@ -1,74 +1,55 @@
 \section{Parallel SGD}
-
-\begin{itemize}
-    \item As before let $T$ a set of training samples $\left\lbrace \left( \bm{x}_{i}, \bm{y}_i \right) \right\rbrace_{i=1}^{m} = \left\lbrace z_{i} \right\rbrace_{i=1}^{m}$
-    \item Let $C \left( \bm{w} \right)$ be the cost function
-    \[
-        C \left( \bm{w} \right) = \frac{1}{N} \sum_{i=0}^{m} C_{z_{i}}\left( \bm{w} \right)
-    \]
-    \item For gradient descent algorithms, we wish to find a weight vector $\bm{w}^{\ast}$ that minimizes our cost function, that is
-    \[
-        \bm{w}^{\ast} = \underset{\bm{w} \in \mathbb{R}^{n}}{\arg \min } \sum_{i=0}^{m} C_{z_{i}}\left( \bm{w} \right)
-    \]
-    \item We shall also introduct the notation $G \triangleq \frac{\partial C}{\partial \bm{w}}$ and $G_{z} \triangleq \frac{\partial C_{z}}{\partial \bm{w}}$ to simplify gradient notation as well as $H \triangleq \frac{\partial G}{\partial \bm{w}}$ and $H_{z} \triangleq \frac{\partial G_{z}}{\partial \bm{w}}$ to simplify Hessian notation.
-    \item At each step of the SGD, a sample $z_{j} = \left( \bm{x}_j , y_{j} \right)$ is uniformly selected from the training set to update the existing weight vector as
-    \[
-        \bm{w}_{t+1} = \bm{w}_{t} - \eta_{t} G_{z_{j}} \left( \bm{w}_{t} \right)
-    \]
-    \item where $\eta_{t}$ is just the learning rate at iteration $t$.
-    \item Say a process performs SGD of a data set $T_{1}$ to get from a weight $\bm{w}_{g}$ to weight $\bm{w}_{1}$. When processing another training set $T_{2}$, a sequential SGD algorithm would have started at weight $\bm{w}_{1}$ to reach a possibly different weight vector $\bm{w}_{h}$.
-    \item To parallelize the SDG algorithm we wish to start computing of training set $T_2$ on weight vector $\bm{w}_{1}$ while simultaneously running the training set $T_1$ on weight vector $\bm{w}_{g}$, but $\bm{w}_{1}$ is not know until SGD is finished with $T_1$. So how do we ge around this?
-    \item One method is to soundly combine models from different processes, in the hopes of achieving a weight vector if SGD was simply run sequentially.
-    \item This requires adjusting the computation of $T_2$ to account for the staleness $\bm{w}_{1} - \bm{w}_{g}$ in the initial model.
-    \item To do so, the second model performs its computations instead on $\bm{w}_{g} - \Delta \bm{w}$ where $\Delta \bm{w}$ is an unknown symbolic vector
-    \item This allows the second model to run in parallel and not have to wait until $\bm{w}_{1}$ is produced from the succeeding model.
-    \item Once the first process is done, the second process takes $\Delta \bm{w}$ to be $\bm{w}_{1} - \bm{w}_{g}$
-    \item This technique can be easily extended to an arbitrary number of processors.
-\end{itemize}
-
-\begin{itemize}
-    \item Let $S_{T} \left( \bm{w} \right)$ represent the SGD computation of a training $T$ from an initial weight vector $\bm{w}$, for example $S_{T_{1}} \left( \bm{w}_{g} \right) = \bm{w}_{1}$
-    \item To come up with a model combiner we need to think about how we can calculate
-    \[
-        S_{T} \left( \bm{w} + \Delta \bm{w} \right)
-    \]
-    \item Assuming $S_{T}$ is differentiable at $\bm{w} + \Delta \bm{w}$, we get following by consider the Taylor series of $S_{T}$ about the point $\bm{w} + \Delta \bm{w}$
-    \[
-        S_{T} \left( \bm{w} + \Delta \bm{w} \right) = S_{T} \left( \bm{w} \right) + S_{T} ' \left( \bm{w} \right) \cdot \Delta \bm{w} + \mathcal{O} \left( \left| \Delta \bm{w} \right|^{2} \right)
-    \]
-    \item We will introduce the notation $M_{D} \triangleq S_{T}'$ as the model combiner. In the equation above the model combiner captures the first order information of how a change in $\Delta \bm{w}$ will effect the SGD
-    \item When $\Delta \bm{w}$ is sufficiently small, one can neglect higher order terms and only use the model combiner to combine models from different processes.
-    \item From CITATION we can show that for a sequence of input examples $z_1 , z_2, \ldots , z_{n}$ the model combiner can be computed as
-    \[
-        M_{D} (\bm{w}) = \prod_{i=1}^{n} \left( \bm{I} - \eta_{i} \cdot H_{z_{i}} \left( S_{T_{i-1}} \left( \bm{w} \right) \right) \right)
-    \]
-    where $S_{T_{0}} \left( \bm{w} \right) = \bm{w}$. This result can be easily shown by applying the chain rule to $S_{T} \left( \bm{w} \right) = S_{T_{n}} \left( S_{T_{n-1}} \left( \ldots \left( S_{1} \left( \bm{w} \right) \right) \right) \right)$.
-\end{itemize}
-
-\begin{itemize}
-    \item Thus to create a parallelized SGD, each of the $p$ processors start with the same initial global weight vector $\bm{w}_{g}$ to compute its local model $S_{T_i} \left( \bm{w}_{g} \right)$ and model combiner $M_{T_{i}} \left( \bm{w}_{g} \right)$ in parallel. A subsequent reduction phase computes $\bm{w}_{i}$ by adjusting the input of processor $i$ by adjusting by the staleness introduced in the $i-1$ processor
-    \[
-        \bm{w}_{i} = S_{T_{i}} \left( \bm{w_{g}} \right) + M_{T_{i}} \left( \bm{w}_{g} \right) \cdot \left( \bm{w}_{i-1} - \bm{w}_{g} \right)
-    \]
-    \item The algorithm for parallel SGD is summaries below
-\end{itemize}
+As before let $T$ a set of training samples $\left\lbrace \left( \bm{x}_{i}, \bm{y}_i \right) \right\rbrace_{i=1}^{m} = \left\lbrace z_{i} \right\rbrace_{i=1}^{m}$. Let $C \left( \bm{w} \right)$ be the cost function for our model to learn off
+\[
+    C \left( \bm{w} \right) = \frac{1}{N} \sum_{i=0}^{m} C_{z_{i}}\left( \bm{w} \right).
+\]
+For gradient descent algorithms, we wish to find a weight vector $\bm{w}^{\ast}$ that minimizes our cost function, that is
+\[
+    \bm{w}^{\ast} = \underset{\bm{w} \in \mathbb{R}^{n}}{\arg \min } \sum_{i=0}^{m} C_{z_{i}}\left( \bm{w} \right)
+\]
+For gradient descent algorithms, we wish to find a weight vector $\bm{w}^{\ast}$ that minimizes our cost function, that is
+\[
+    \bm{w}^{\ast} = \underset{\bm{w} \in \mathbb{R}^{n}}{\arg \min } \sum_{i=0}^{m} C_{z_{i}}\left( \bm{w} \right)
+\]
+Let's introduce the notation $G \triangleq \frac{\partial C}{\partial \bm{w}}$ and $G_{z} \triangleq \frac{\partial C_{z}}{\partial \bm{w}}$ to simplify gradient notation as well as $H \triangleq \frac{\partial G}{\partial \bm{w}}$ and $H_{z} \triangleq \frac{\partial G_{z}}{\partial \bm{w}}$ to simplify Hessian notation. At each step of the SGD, a sample $z_{j} = \left( \bm{x}_j , y_{j} \right)$ is uniformly selected from the training set to update the existing weight vector as
+\[
+    \bm{w}_{t+1} = \bm{w}_{t} - \eta_{t} G_{z_{j}} \left( \bm{w}_{t} \right)
+\]
+where $\eta_{t}$ is just the learning rate at iteration $t$. Say a process performs SGD of a data set $T_{1}$ to get from a weight $\bm{w}_{g}$ to weight $\bm{w}_{1}$. When processing another training set $T_{2}$, a sequential SGD algorithm would have started at weight $\bm{w}_{1}$ to reach a possibly different weight vector $\bm{w}_{h}$. To parallelize the SDG algorithm we wish to start computing of training set $T_2$ on weight vector $\bm{w}_{1}$ while simultaneously running the training set $T_1$ on weight vector $\bm{w}_{g}$, but $\bm{w}_{1}$ is not know until SGD is finished with $T_1$. So how do we get around this? One method is to soundly combine models from different processes in the hopes of achieving a weight vector had the SGD was instead run sequentially \cite{MalekiSaeed2017PSGD}. This requires adjusting the computation of $T_2$ to account for the staleness $\bm{w}_{1} - \bm{w}_{g}$ in the initial model. To do so, the second model performs its computations instead on $\bm{w}_{g} - \Delta \bm{w}$ where $\Delta \bm{w}$ is an unknown symbolic vector. This allows the second model to run in parallel and not have to wait until $\bm{w}_{1}$ is produced from the succeeding model. Once the first process is done, the second process takes $\Delta \bm{w}$ to be $\bm{w}_{1} - \bm{w}_{g}$. This technique can be easily extended to an arbitrary number of processors.\\[1\baselineskip]
+Let $S_{T} \left( \bm{w} \right)$ represent the SGD computation of a training $T$ from an initial weight vector $\bm{w}$, for example $S_{T_{1}} \left( \bm{w}_{g} \right) = \bm{w}_{1}$. To come up with a model combiner we need to think about how we can calculate
+\[
+    S_{T} \left( \bm{w} + \Delta \bm{w} \right).
+\]
+Assuming $S_{T}$ is differentiable at $\bm{w} + \Delta \bm{w}$, we get the following by consider the Taylor series of $S_{T}$ about the point $\bm{w} + \Delta \bm{w}$
+\[
+    S_{T} \left( \bm{w} + \Delta \bm{w} \right) = S_{T} \left( \bm{w} \right) + S_{T} ' \left( \bm{w} \right) \cdot \Delta \bm{w} + \mathcal{O} \left( \left| \Delta \bm{w} \right|^{2} \right).
+\]
+We will introduce the notation $M_{D} \triangleq S_{T}'$ as the model combiner. In the equation above the model combiner captures the first order information of how a change in $\Delta \bm{w}$ will effect the SGD. When $\Delta \bm{w}$ is sufficiently small, one can neglect higher order terms and only use the model combiner to combine models from different processes. From \cite{MalekiSaeed2017PSGD} we can show that for a sequence of input examples $z_1 , z_2, \ldots , z_{n}$ the model combiner can be computed as
+\[
+    M_{D} (\bm{w}) = \prod_{i=1}^{n} \left( \bm{I} - \eta_{i} \cdot H_{z_{i}} \left( S_{T_{i-1}} \left( \bm{w} \right) \right) \right)
+\]
+where $S_{T_{0}} \left( \bm{w} \right) = \bm{w}$. This result can be easily shown by applying the chain rule to $S_{T} \left( \bm{w} \right) = S_{T_{n}} \left( S_{T_{n-1}} \left( \ldots \left( S_{1} \left( \bm{w} \right) \right) \right) \right)$.\\[1\baselineskip]
+Thus to create a parallelized SGD, each of the $p$ processors start with the same initial global weight vector $\bm{w}_{g}$ to compute its local model $S_{T_i} \left( \bm{w}_{g} \right)$ and model combiner $M_{T_{i}} \left( \bm{w}_{g} \right)$ in parallel. A subsequent reduction phase computes $\bm{w}_{i}$ by adjusting the input of processor $i$ by adjusting by the staleness introduced in the $i-1$ processor
+\[
+    \bm{w}_{i} = S_{T_{i}} \left( \bm{w_{g}} \right) + M_{T_{i}} \left( \bm{w}_{g} \right) \cdot \left( \bm{w}_{i-1} - \bm{w}_{g} \right).
+\]
+The algorithm for parallel SGD is summarised in algorithm \ref{alg:parallel-SGD}
 
 \begin{algorithm}[ht!!!]
     \caption{Parallel SGD}
     \label{alg:parallel-SGD}
-    \footnotesize
     \SetAlgoLined
-        \SetKwInOut{Input}{input}\SetKwInOut{Output}{output}
-        \Input{Training data $T$, an initial weight vector $\bm{w}_{g}$ and the number of processes to perform the algorithm $p$}
-        \Output{Updated weight vector}
-        \BlankLine
-        $\left\lbrace T_{1} , T_{2}, \ldots , T_{p} \right\rbrace \gets$ an equal partition of $T$\;
-        \For{$T_{i} \in \left\lbrace T_{1} , T_{2}, \ldots , T_{p} \right\rbrace$ {\bf concurrently}}{
-            Compute $S_{T_{i}} \left( \bm{w_{g}} \right)$ and $M_{T_{i}} \left( \bm{w}_{g} \right)$\;
-        }
-        \For{$i \in \left\lbrace 1,2, \ldots , p \right\rbrace$}{
-            $\bm{w}_{i} \gets S_{T_{i}} \left( \bm{w_{g}} \right) + M_{T_{i}} \left( \bm{w}_{g} \right) \cdot \left( \bm{w}_{i-1} - \bm{w}_{g} \right)$\;
-        }
-        \KwResult{$\bm{w}_{p}$}
-        \BlankLine
-    \end{algorithm}
+    \SetKwInOut{Input}{input}\SetKwInOut{Output}{output}
+    \Input{Training data $T$, an initial weight vector $\bm{w}_{g}$ and the number of processes to perform the algorithm $p$}
+    \Output{Updated weight vector}
+    \BlankLine
+    $\left\lbrace T_{1} , T_{2}, \ldots , T_{p} \right\rbrace \gets$ an equal partition of $T$\;
+    \For{$T_{i} \in \left\lbrace T_{1} , T_{2}, \ldots , T_{p} \right\rbrace$ {\bf concurrently}}{
+        Compute $S_{T_{i}} \left( \bm{w_{g}} \right)$ and $M_{T_{i}} \left( \bm{w}_{g} \right)$\;
+    }
+    \For{$i \in \left\lbrace 1,2, \ldots , p \right\rbrace$}{
+        $\bm{w}_{i} \gets S_{T_{i}} \left( \bm{w_{g}} \right) + M_{T_{i}} \left( \bm{w}_{g} \right) \cdot \left( \bm{w}_{i-1} - \bm{w}_{g} \right)$\;
+    }
+    \KwResult{$\bm{w}_{p}$}
+    \BlankLine
+\end{algorithm}

@@ -1,1 +1,29 @@
+\section{Questions}
+
 % Show that the expected prediction of a KNN is the same as the normal KNN
+\renewcommand{\labelenumi}{\textbf{Q\arabic{enumi})}}
+\renewcommand{\labelenumii}{\textbf{\alph{enumii})}}
+\begin{enumerate}
+
+% KNN questions
+\item 
+    \begin{enumerate}
+        \item Suppose the training set
+        \[T = \left\{ \left( \left[ 0,1 \right], 0 \right), \left( \left[ 1,1 \right], 0 \right), \left( \left[ 2,1 \right], 0 \right), \left( \left[ 2,2 \right], 0 \right), \left( \left[ 5,8 \right], 1 \right), \left( \left[ 6,7 \right], 1 \right), \left( \left[ 5,7 \right], 1 \right), \left( \left[ 4,5 \right], 1 \right) \right\}\]
+        was partitioned into
+        \begin{align*}
+            T_{1} &= \left\{ \left( \left[ 2,1 \right], 0 \right), \left( \left[ 2,2 \right], 0 \right), \left( \left[ 5,8 \right], 1 \right), \left( \left[ 6,7 \right], 1 \right) \right\} \\
+            T_{2} &= \left\{ \left( \left[ 2,1 \right], 0 \right), \left( \left[ 2,2 \right], 0 \right), \left( \left[ 5,8 \right], 1 \right), \left( \left[ 6,7 \right], 1 \right) \right\}
+        \end{align*}
+        for a k-NN parallel algorithm using the $2$ closest neighbours and the Manhattan distance metric to classify the an unknown sample $\bm{x} = \left[ 0,0 \right]$ use two processes. What $2$ closest neighbours would be returned by each of the processors?
+        
+        \item Would the parallel k-NN algorithm still work if only $k-1$ closest neighbours was instead returned by each process?
+        
+        \item 
+        \begin{enumerate}
+            \item Implement your own parallel k-NN algorithm from scratch in python, only using the \texttt{threading} and \texttt{queue} libraries to perform parallelism. Use \texttt{sklearn}s \href{https://scikit-learn.org/stable/modules/generated/sklearn.datasets.load_iris.html}{iris dataset} to test your model, you can access this data set using the import \texttt{from sklearn import datasets} and then creating the dataset by using \texttt{datasets.load\_iris()}.
+            \item Assuming the completion of the question above, implementing these parallel algorithms yourself can be tedious and error prone. Forturnately many parallel Machine Learning algoirthms and models have been implemented for us already in \texttt{python}s \texttt{sklearn} library. Like \texttt{pytorch}, \texttt{sklearn} is free to use python library that implements many of the Machine Learning tools seen in this course. Use \texttt{sklearn}s \texttt{KNeighborsClassifier} class to train on the \textit{breast cancer} data. Leave $\frac{1}{5}$ of the data aside to provide a test accuracy. Submit this script to \texttt{golith} using a job batch file. Use repeat training with $1-4$ threads and record your results. {\it Hint:} you will need to adjust the \texttt{n\_jobs} parameter in the \texttt{KNeighborsClassifier} to chnage the number of threads used for running the k-NN algorithm.
+        \end{enumerate}
+    \end{enumerate}
+
+\end{enumerate}

@@ -1,0 +1,40 @@
+\section{Answers}
+
+\subsection*{{\bf Q1)}}
+\subsubsection*{{\bf a)}}
+The neighbours to be returned by the first and second process would be $\left\{ \left( \left[ 2,1 \right], 0 \right), \left( \left[ 2,2 \right], 0 \right) \right\}$ and $\left\{ \left( \left[ 2,1 \right], 0 \right), \left( \left[ 2,2 \right], 0 \right) \right\}$ respectively.
+
+\subsubsection{{\bf b)}}
+No, all $k$ closest neighbours may randomly be given to a single process. If some of these $k$ closest neighbours  were neglected by this process then not all the $k$ closest neighbours will be used in the final reduction step which may give differing results to the serial k-NN algorithm.
+
+\subsubsection{{\bf c)}}
+\subsubsection{{\bf i)}}
+The code for the k-NN algorithm implemented from scratch is shown below
+\inputminted[mathescape,
+    linenos,
+    numbersep=5pt,
+    frame=lines,
+    framesep=2mm]{python}{src/KNN_parallel.py}
+
+\subsubsection{{\bf ii)}}
+An example batch file for job submission is shown below
+\inputminted[mathescape,
+    linenos,
+    numbersep=5pt,
+    frame=lines,
+    framesep=2mm]{bash}{src/batch/KNN_1_thread.py}
+    
+Code to training a parallel k-NN algorithm using \texttt{sklearn} is given below
+\inputminted[mathescape,
+    linenos,
+    numbersep=5pt,
+    frame=lines,
+    framesep=2mm]{python}{src/KNN_demo.py}
+    
+The times for running the parallel algorithm with different numbers of processes is shown below
+\begin{table}[]
+\begin{tabular}{l|cccc}
+Number of threads & 1 & 2 & 3 & 4 \\ \cline{2-5} 
+Time (sec)        & $0.03754734$ & $0.02993416$ & $0.0252390$ & $0.01833604$
+\end{tabular}
+\end{table}

@@ -105,7 +105,7 @@
         $\overline{y} \gets \underset{y}{\arg \max } \; \bm{w}^{(k)} \cdot f(\bm{x}, y)$\;
         
         \uIf{$\overline{y} \neq y$}{
-            $\bm{w}^{(k+1)} \gets \bm{w}^{(k)} + f(\bm{x}, y) - f(\bm{x}, \overline{y})$\;
+            $\bm{w}^{(k+1)} \gets \bm{w}^{(k)} + f(\bm{x}_{i}, y_{i}) - f(\bm{x}_{i}, \overline{y})$\;
             $k \gets k+1$\;
         }
     }
